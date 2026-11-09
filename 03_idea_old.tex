@@ -1,0 +1,72 @@
+% the idea
+\section{High-Level Idea} \label{chapter:idea}
+\todo{To Be Updated}\\
+This project focuses on abstracting grounded symbols and using them for planning action. To achieve this goal, the starting point is a framework developed by \textcite{konidaris2018skills}. The algorithm implemented and methods used slightly differ from the original, all in attempt of getting closer to biological accuracy.\\
+Broadly speaking, abstract symbols emerge from preconditions and effects of skills executed by robot in an environment. These symbols are represented in perceptual space then used for abstract planning. To fully focus on symbols we assume that skills are already coded (or learnt) and that we are able to distinguish between a successfully executed skill and a failed attempt. To give agent's actions a structure, there is a task to be completed. The achievement of this task is also verified externally. This means that the learning is supervised, yet programmer do not determines what symbols are going to be learned in other means than choosing skills and the task. The utility of said symbols is presented in planing and executing a said task using PDDL language. Yet, both planing and executing is not a point of its own for this project.\\
+The algorithm is heavily inspired by \textcite{konidaris2018skills}, but it differs in number of places. Inspirations for those changes mostly come from the desire to model biological functioning more accurately, but some are just simplifications.\\
+The differences:
+\begin{itemize}
+    \item The agent and the task are simplified in order to facilitate the programming of skills and shorten the time needed for simulation. Additionally, this can show that the symbols are specific to the shape, sensors and actuators of the agent, but a method is universal.
+    \item There is no exploring and exploiting phases. The agent is consistently collecting unexpected data, and updates its symbols in batches. This resemble the activity of biological agents, including sleep patterns. \checkthis{(not explained earlier, is it a problem?)}
+    \item Instead of collecting all the precondition and effect data, each is represented by its own GNG network. Those networks are based on neural networks so have better biological accuracy than clusters of data. GNGs are updated on the data that is unexpected, for example an agent succeed in region that GNG indicates as a failure.
+    \item Original work find the possible transitions between options by clustering data using DB-SCAN. This project calculates the coverage by checking how many GNG points from effect land within the precondition symbol.
+\end{itemize}
+
+\subsection{Abstracting The Symbols} \label{chapter:idea:abstract}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth, height=0.85\textheight, keepaspectratio]{pictures/abstrahowanie.png}
+    \caption{Visual guide to abstracting symbols from collected data. A symbol is a subspace of perceptual space that stays invariant through all the executions of a given skill, and is changed in consequence of executing given skill.}
+    \label{fig:abstract}
+\end{figure}
+
+\subsection{Algorithm Description} \label{chapter:idea:algorithm}
+Most important parts of the algorithm are shown on figures \ref{fig:flow_main} - \ref{fig:flow_abstract} as a flowcharts. \textit{Main Loop} is the core of functioning, it controls execution and learning. I explain the program while referring to the flowcharts in following subsections. The description of the program's operation is divided into three parts: first loops, successful operating, and case analysis.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth, height=0.85\textheight, keepaspectratio]{pictures/main_loop.png}
+    \caption{Main Loop Flowchart: The flowchart represents main loop of the program allowing to explore the environment and exploit gathered knowledge.}
+    \label{fig:flow_main}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth, height=0.85\textheight, keepaspectratio]{pictures/generate_plan.png}
+    \caption{Generate Plan Flowchart: Flowchart for process of generating executable plan. It includes abstracting symbols from Growing Neural Gas Predicates.} 
+    \label{fig:flow_plan}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth, height=0.85\textheight, keepaspectratio]{pictures/execute_skill.png}
+    \caption{Execute Skill Flowchart: Flowchart for a process allowing executing chosen skill and collecting necessary data for updating Growing Neural Gas predicates.}
+    \label{fig:flow_exec}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth, height=0.85\textheight, keepaspectratio]{pictures/read_state.png}
+    \caption{Read State Flowchart: Flowchart for a process of reading current state. It includes identifying current state in Growing Neural Gas network and assessing if known symbols' conditions are satisfied.}
+    \label{fig:flow_state}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth, height=0.85\textheight, keepaspectratio]{pictures/abstract_symbols.png}
+    \caption{Abstract Symbols Flowchart: Flowchart for process of abstracting symbols at the junction of two skills (transitions). It is obtain by determining the common hyperplane in perceptual space.} 
+    \label{fig:flow_abstract}
+\end{figure}
+
+\subsubsection*{First loops}
+First step in the main loop (Figure \ref{fig:flow_main}) is to generate a plan, but at the very beginning, for every predicate: precondition or effect, there is no GNG. This means that the plan will not be generated, since no precondition of any skill is satisfied (Figure \ref{fig:flow_plan}). Empty, invalid plan leads to exploration. This sub-process randomly choose skill from all the skills available to the agent and executes it (Figure \ref{fig:flow_exec}).  Here is the most important role of the \textit{Supervisor}. It oversees the execution and returns if the skill was completed successfully (the result). The state of a robot is read before and after the execution (Figure \ref{fig:flow_state}). This information is most crucial for abstracting symbols. The result and evaluation of the predicate  label the execution either as expected or not. The collected perceptual states from unexpected executions are used to update the predicates: both precondition and effect. In the first loops predicates are almost always unsatisfied, so execution of any skill leads to updating them - the agent starts to learn.
+
+\subsubsection*{Successful Operating}
+Once the agent learned enough that some preconditions are active, the plan can be generated (Figure \ref{fig:flow_plan}). Agent chooses start randomly from any active option. Then it chooses a goal from all available options. Then the PDDL files are generated. For this transitions and their symbols are needed. Abstracting symbols creates symbols for transitions between skills. For each pair of skills, if all the points in effect GNG of preceding skill land within the precondition GNG of following skill, the symbol is created. This is because if executing the preceding skill results in the precondition being fulfilled, the following skill can be executed successfully. \todo{(But those symbols are useless, so let just say that the abstracting is continuous)} Once all the symbols are ready, the domain.pddl and plan.pddl can be generated. Then, assuming that there is a path between the start and the goal, the plan is generated as a list of skills to be executed one by one. The agent executes them, and go back to the planning.
+
+\subsubsection*{Case Analysis}
+\textbf{Failed to execute a step of a plan}\\
+If an agent fail to execute a step of a plan, he simply add this to the updating data, and go back to exploration. During early steps this is often the case, because transitions are based on few examples. \\
+\textbf{New skill added} \\
+Adding a new skill to a trained agent does not require modifying old predicates. Transitions are automatically recalculated whenever predicates change, including when a new one is introduced. This way, the agent can operate with changing objectives\\
+\checkthis{What should be added?}
