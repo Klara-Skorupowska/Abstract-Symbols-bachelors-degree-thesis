@@ -1,0 +1,28 @@
+\section{Symbolic representations.} \label{app:symbols}
+
+% --- Helper Functions ---
+\newcommand{\skillFigure}[3]{%
+  % #1: Human-readable Skill Name (e.g. Finish)
+  % #2: File type (e.g. precondition -> init, effect -> eff)
+  % #3: symbol type (e.g. precondition, effect)
+  \StrSubstitute{#1}{_}{ }[\skillname]
+  \begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.9\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{pictures/#1_#2_icon.png}
+      \caption{Iconic representation}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.9\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{pictures/#1_#2_invariants.png}
+      \caption{Categorical representation}
+    \end{subfigure}
+    \caption{'\skillname' skill #3 symbolic representation. Two types of visualising obtained symbol: iconic and categorical.}
+  \end{figure}
+}
+
+\foreach \skill in {Start, Find_the_Door, Go_to_the_Door, Open_the_Door, Find_the_Goal, Go_to_the_Goal, Finish} {
+    \skillFigure{\skill}{init}{precondition}
+    \skillFigure{\skill}{eff}{effect}
+}

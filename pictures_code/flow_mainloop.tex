@@ -1,0 +1,53 @@
+\begin{tikzpicture}[node distance=1.6cm]
+
+\node (start) [startstop] {Main Loop};
+
+\node (read_state1) [subroutine, below of=start, yshift=-0.5cm] {Read State};
+
+\node (gen_plan) [subroutine, below of=read_state1, yshift=-0.5cm] {Generate Plan};
+
+\node (plan_valid) [decision, below of=gen_plan, yshift=-0.5cm] {Plan Valid?};
+
+\node (explore) [subroutine, right of=plan_valid, xshift=3.2cm] {Explore};
+
+\node (exec_step) [subroutine, below of=plan_valid, yshift=-0.6cm] {Execute Skill \small{(Next Step of the Plan)}};
+
+\node (read_state2) [subroutine, below of=exec_step, yshift=-0.5cm] {Read State};
+
+\node (check_success) [decision, below of=read_state2, yshift=-0.5cm] {Skill Succeeded?};
+
+\node (effects_there) [decision, below of=check_success, yshift=-1cm] {Expected Effects?};
+
+\node (save) [subroutine, right of=effects_there, xshift=3.2cm] {Save Data to the Buffer};
+
+\node (more_steps) [decision, below of=effects_there, yshift=-1cm] {Plan Completed?};
+
+% Arrows - Loop initiation
+\draw [arrow] (start) -- (read_state1);
+\draw [arrow] (read_state1) -- (gen_plan);
+
+% Arrows - Plan validation
+\draw [arrow] (gen_plan) -- (plan_valid);
+\draw [arrow] (plan_valid) -- node[anchor=south] {No} (explore);
+\draw [arrow] (explore) |- (gen_plan.east);
+\draw [arrow] (plan_valid) -- node[anchor=east] {Yes} (exec_step);
+
+% Arrows - succeed
+\draw [arrow] (exec_step) -- (read_state2);
+\draw [arrow] (read_state2) -- (check_success);
+\draw [arrow] (check_success) -- ++(3cm, 0) node[anchor=south] {No} -| (explore);
+\draw [arrow] (check_success) -- node[anchor=east] {Yes} (effects_there);
+
+% Arrows - expected effects
+\draw [arrow] (effects_there) -- node[anchor=south] {No} (save);
+\draw [arrow] (save) -- (explore.south);
+\draw [arrow] (effects_there) -- node[anchor=east] {Yes} 
+(more_steps);
+
+% Arrows - plan completed
+\draw [arrow] (more_steps) -- node[anchor=south] {No} ++(-4cm, 0)
+              |- (exec_step.west);
+\draw [arrow] (more_steps.south) -- node[anchor=east] {Yes} ++(0, -1cm) -- ++(-5cm, 0)
+              |- (gen_plan.west);
+
+\end{tikzpicture}

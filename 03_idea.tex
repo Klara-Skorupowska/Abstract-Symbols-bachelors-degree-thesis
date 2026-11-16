@@ -1,0 +1,139 @@
+\section{High-Level Idea} \label{chapter:idea}
+
+\subsection{\checkthis{The Story}}
+Imagine an embodied agent - a robot. We want it to complete a task for us. It has a library of ready-to-use skills. To complete the task, the robot needs to execute those skills in correct order. But, for slightly different task, or in different circumstances, some skills may be unnecessary, or the order needs to be changed. We want our robot to smoothly adapt to the changes in an environment and given objectives, and only focus on what is important for a specific skill. 
+
+Take a closer look at the skills. A skill is a list of low-level actions, that can be executed by this robot. Their execution ends either successfully, or fail at some action. Obviously, the robot should execute a skill only when it can assume that the execution is going to be successful. For that each one comes with a precondition. A precondition is a symbol, or conjunction of them, that says "You can do this skill now". These symbols are predicates resolvable by examining the perceptual state of the robot. Robot can take a look around and decide if a skill is save to execute. Then, after skill execution, the robot changes its perceptual state, either by changing something in the environment or changing its location. This new state is another predicate: an effect. Since the robot is supposed to execute skills successfully, only effects of those are of any interest to it. Then robot uses those predicates to establish which skills need to be done, and in which order to complete assigned task. The aim of this project is to let the robot learn those predicates on its own.
+
+\subsection{Starting Point}
+This is a replication of the work of \textcite{konidaris2018skills}. They proposed a framework for abstracting grounded symbols from predefined skills. Their framework collected data from repetitions of skills. It saves initial and final states in a form of 3D representation as cloud of points. Then, it uses clustering methods, such as DB-SCAN to find what the skill changes in the environment. In the learning setting, the robot had two arms, a mobile platform, and a binocular vision. The task setting was a room with a bottle in a closed fridge and a closed cupboard. The task for the robot was to move a bottle from the fridge to the cupboard. In a learning phase, the skills, such as opening the fridge, were repeatedly executed, starting from a known initial state. The learning data consisted only of successfully completed trials. Then they used the clustering algorithm to find clusters of repetitive patterns through all the repetitions. This way they obtained symbols that could be interpreted, for example, as "Fridge is open", or "robot is holding the bottle". 
+
+Starting from this framework, this project aims to abstract symbols continuously, without seperating learning and exploiting phases. Additionally, some changes are made in the data collection and abstraction methods to make them more biologically accurate.
+
+\subsection{Algorithm Description}
+
+In contrast to the original work, this framework runs uninterrupted, continuously trying to finish the given task. As a part of the mechanism, obtaining symbols will enable it to do so. Figures \ref{fig:flow_mainloop} to \ref{fig:flow_generate_plan} show the logic of the most important processes within the framework. The learning and exploiting phases are intertwined into the main loop of the program.
+
+The learning process is partially supervised. The execution of skills is evaluated externally by the Supervisor. The supervisor does not interfere with the symbol abstracting mechanism but rather is a guide whether the outcome is desirable or not.
+
+The exploiting process is based on the PDDL language. The agent generates a plan based on the current state of the environment and the learned symbols. Then, it executes the plan step by step, while continuously checking if the execution is successful. If not, it explore by executing random skill, and tries to generate a new plan.
+
+\begin{figure}[htbp]
+    \centering
+    \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+        \input{pictures_code/flow_mainloop.tex}
+    }
+    \caption{A flowchart of the main loop of the program. The agent continuously tries to generate a plan and execute it. If the execution fails, it explores by executing a random skill.} 
+    \label{fig:flow_mainloop}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+        \input{pictures_code/flow_generateplan.tex}
+    }
+    \caption{A flowchart of the plan generation process. The agent attempts to generate a valid plan based on the current state and learned symbols.} 
+    \label{fig:flow_generate_plan}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+        \input{pictures_code/flow_save2buffer.tex}
+    }
+    \caption{A flowchart of the data saving process. The agent saves the initial and final states of a skill execution into a buffer for later symbol abstraction. Once the buffer is full, the agent triggers the symbol abstraction process.} 
+    \label{fig:flow_save2buffer}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+        \input{pictures_code/flow_readstate.tex}
+    }
+    \caption{A flowchart of the state reading process. The agent reads the current state of the environment. A state is dually represented as a vector in perceptual space and as a set of active abstract symbols.} 
+    \label{fig:flow_read_state}
+\end{figure}
+
+\subsubsection*{First Loops}
+During first few loops, the robot has no knowledge about the environment at all. There are no raw predicates nor any abstract symbols. The program starts with an attempt to generate plan (fig. \ref{fig:flow_mainloop}). It tries to solve a task, but since the state described by symbols is empty, it fails (fig. \ref{fig:flow_generate_plan}). No valid plan to execute means exploring. Exploring is done by executing a random skill from a given skillset. If the execution is successful, the data is saved (fig. \ref{fig:flow_save2buffer}). This way the robot collects information about how the skills interfere with the environment, and what can be done using them. After a few explorations and collecting enough data, it is possible to form a predicate. This predicate is an object in perceptual space that represent the “before” or “after” of the skill. Abstracting symbols partition these objects into pieces relevant for different skills. Once the influence of the skills on the environment is established, the robot can use the abstract symbols in planning and manage the task.
+
+\subsubsection*{Adding New Skills}
+Let us assume that we have fully working abstract model of skill-environment interactions for a skillset. Expanding a skillset do not interfere with learned symbols as they are all independent. Robot need to go through exploring to abstract symbol for the new skill and update partitioning of symbols for other skills. It is also possible to manually insert existing symbols into preconditions and effects of a new skill. This way, the skillset can be expanded without additional learning.
+
+\subsubsection*{New Elements in Environment}
+Since there is no exploring and exploiting phases. In a new environment, the robot smoothly goes back to more frequent exploring. After enough experiences, the new symbols emerge. They describe the interactions between the skills and the current environment. The previously gathered knowledge is not erased, as the new experiences occure in unexplored corners of perceptual space. These new experiences expand the shape of representations, not replace them. The robot can operate in both environments. The knowledge is lost only for no longer visited areas of perceptual space. The robot forgets the knowledge about the environment that is no longer relevant for the task. 
+
+\subsection{Abstracting Symbols}
+Abstracting symbols is a mathematical operation on sets of points in perceptual space. Figure \ref{fig:abstracting_symbols} shows the process of abstracting symbols. The symbol is a region in perceptual space that was changed by the skill. For example, if the skill is to push a door open, the initial states are all the states where the robot is in front of the door, and the effect states are all the states where the robot is in the next room. Execution of the skill changes, for example, the distance between the robot and the door, and colors in the vision. Each point may differ slightly, as the execution is possible from different positions. The algorithm finds the common features of those points and abstracts them into a precondition symbol. The effect symbol is a representation of the skill's effect on the environment, obtained as the intersection of the effect states. Additionally, algorithm finds the overlapping features of precondition and effect symbols, and removes them from both. This way, the symbols are mutually disjoint, and only the features that are changed by the skill remain. Lastly, the symbols are partitioned into disjoint sets, so they can be used in symbolic planning.
+
+\begin{figure}[htbp]
+    \centering
+    \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+        \input{pictures_code/abstracting_symbols.tex}
+    }
+    \caption{An ideogram of the symbol abstraction process. The abstraction relies on finding common features of experience points and abstracts them into precondition and effect symbols. Symbols show the skill-environment interaction.} 
+    \label{fig:abstracting_symbols}
+\end{figure}
+
+Formally, the abstraction algorithm is described as follows.
+
+The robot collects \textit{experiences}. An experience is a triple consisting of a \textit{precondition}, a \textit{skill}, and an \textit{effect}. The precondition and effect are vectors in a continuous perceptual space $\mathcal{S}$, while the skill is a discrete label representing the action executed between them. An experience is recorded in two situations: upon successful execution of a skill during exploration, or during plan execution when the resulting effect differs from the expected one. Experience is defined as follows:
+
+\begin{equation} \label{eq:experience}
+    \text{Exp}_k^{A_i} = (s_{\text{init}, k}, A_i, s_{\text{eff}, k})
+\end{equation}
+\noindent\small
+\begin{tabular}{@{}l@{\hskip 6pt}l}
+    \textbf{where:} & $\text{Exp}_k^{A_i}$ is the $k$-th recorded experience for skill $A_i$, \\
+                    & $s_{\text{init}, k} \in \mathcal{S}$ is the initial perceptual state before execution, \\
+                    & $A_i$ is the executed skill, \\
+                    & $s_{\text{eff}, k} \in \mathcal{S}$ is the resulting perceptual state after execution.
+\end{tabular}
+\normalsize
+
+From the set of $N$ recorded experiences for a given skill $A_i$, the robot learns \textit{predicates}. Each individual experience $k$ is used to generate a perceptual region for its initial state, $R_{\text{init}, k}^{A_i} \subset \mathcal{S}$, and its effect state, $R_{\text{eff}, k}^{A_i} \subset \mathcal{S}$. The general precondition and effect predicates for skill $A_i$ are defined as the intersection of these states across all $N$ experiences:
+
+\begin{align}
+    P_{\text{init}}^{A_i} &= \bigcap_{k=1}^{N} R_{\text{init}, k}^{A_i} \label{eq:pred_init} \\
+    P_{\text{eff}}^{A_i} &= \bigcap_{k=1}^{N} R_{\text{eff}, k}^{A_i} \label{eq:pred_eff}
+\end{align}
+\noindent\small
+\begin{tabular}{@{}l@{\hskip 6pt}l}
+    \textbf{where:} & $P_{\text{init}}^{A_i}$ is the precondition predicate for skill $A_i$, \\
+                    & $P_{\text{eff}}^{A_i}$ is the effect predicate for skill $A_i$.
+\end{tabular}
+\normalsize
+
+Next, \textit{abstract symbols} are formed by subtracting the overlapping region between the precondition and effect predicates ($P_{\text{init}}^{A_i} \cap P_{\text{eff}}^{A_i}$), which represents perceptual features that are changed throughout the execution of the skill:
+
+\begin{align}
+    Q_{\text{init}}^{A_i} &= P_{\text{init}}^{A_i} \setminus P_{\text{eff}}^{A_i} \label{eq:sym_init} \\
+    Q_{\text{eff}}^{A_i} &= P_{\text{eff}}^{A_i} \setminus P_{\text{init}}^{A_i} \label{eq:sym_eff}
+\end{align}
+\noindent\small
+\begin{tabular}{@{}l@{\hskip 6pt}l}
+    \textbf{where:} & $Q_{\text{init}}^{A_i}$ is the abstract precondition symbol for skill $A_i$, \\
+                    & $Q_{\text{eff}}^{A_i}$ is the abstract effect symbol for skill $A_i$.
+\end{tabular}
+\normalsize
+
+Finally, to ensure the symbols are mutually disjoint and suitable for symbolic planning, the set of all abstract symbols $\mathcal{Q} = \bigcup_{i} \{Q_{\text{init}}^{A_i}, Q_{\text{eff}}^{A_i}\}$ is partitioned into non-overlapping subsets. By iteratively projecting and subtracting smaller subsets from larger ones (ordered by cardinality/volume from largest to smallest), each symbol $Q \in \mathcal{Q}$ is refined into a disjoint set $Q'$:
+
+\begin{equation} \label{eq:partition}
+    Q' = Q \setminus \bigcup_{Q_j \in \mathcal{Q} \,:\, |Q_j| < |Q|} Q_j
+\end{equation}
+\noindent\small
+\begin{tabular}{@{}l@{\hskip 6pt}l}
+    \textbf{where:} & $Q'$ is the partitioned, mutually disjoint abstract symbol, \\
+                    & $Q_j \in \mathcal{Q}$ are all other abstract symbols with strictly smaller cardinality ($|Q_j| < |Q|$).
+\end{tabular}
+\normalsize
+
+To optimize memory usage and biological plausibility, those operations are not performed on raw sets of points, but rather on the reference vectors of the learned Growing Neural Gas (GNG) nodes. Following the neurosymbolic abstraction formalism of Sridhar et al.~\textcite{sridhar2023guaranteed}, the ${Exp}_k^{A_i}$ set continouosly generates a GNG graph. The graph is represented by nodes, called memories $m_k^{A_i}$. The reference vectors of the learned GNG nodes induce a Voronoi tessellation that partitions $\mathcal{S}$ into disjoint convex cells bounded by the perpendicular bisectors of neighboring nodes. Consequently, we treat the perceptual region $R_{\text{init}, k}^{A_i} \subset \mathcal{S}$ (and analogously $R_{\text{eff}, k}^{A_i} \subset \mathcal{S}$) as the set of perceptual states belonging to the Voronoi cells associated with the active GNG nodes for that experience. \todo{POPRAW:} This formalism enable constraint coś tam blele ble, sama na to wpadłam, ale panowie mają matmę po stwojej stronie.  
+
+In summary, the abstract symbols are learned by intersecting the perceptual regions of multiple experiences for each skill, subtracting overlapping features to isolate the changed perceptual features, and partitioning the resulting symbols into mutually disjoint sets suitable for symbolic planning. This process allows the robot to generalize its knowledge of skill-environment interactions and apply it to new situations.

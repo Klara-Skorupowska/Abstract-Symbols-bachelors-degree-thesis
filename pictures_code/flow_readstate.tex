@@ -1,0 +1,15 @@
+\begin{tikzpicture}[node distance=1.6cm]
+
+\node (start) [startstop] {Read State};
+
+\node (read_sensors) [io, below of=start] {Read Sensors};
+
+\node (preprocess) [subroutine, below of=read_sensors] {Preprocess Sensor Data};
+
+\node (stop) [startstop, below of=preprocess] {Return State};
+
+\draw [arrow] (start) -- (read_sensors);
+\draw [arrow] (read_sensors) -- (preprocess);
+\draw [arrow] (preprocess) -- (stop);
+
+\end{tikzpicture}

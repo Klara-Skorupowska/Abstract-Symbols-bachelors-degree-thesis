@@ -1,0 +1,32 @@
+\begin{tikzpicture}[node distance=1.6cm]
+
+% nodes
+\node (start) [startstop] {Generate Plan};
+
+\node (read_state) [process, below of=start] {Read State};
+
+\node (active_predicates) [decision, below of=read_state, yshift=-0.4cm] {Symbolic State?};
+
+\node (generate_problem) [subroutine, below of=active_predicates, yshift=-0.8cm] {Generate Problem File};
+
+\node (plan) [subroutine, below of=generate_problem] {Run Planner};
+
+\node (done) [decision, below of=plan, yshift=-0.5cm] {Plan Found?};
+
+\node (read_plan) [startstop, below of=done, yshift=-0.8cm] {Return Plan \small{(list of skills)}};
+
+\node (fail) [startstop, right of=read_plan, xshift=3.2cm] {Return Invalid Plan};
+
+% arrows
+\draw [arrow] (start) -- (read_state);
+\draw [arrow] (read_state) -- (active_predicates);
+
+\draw [arrow] (active_predicates) -- node[anchor=east] {Yes} (generate_problem);
+\draw [arrow] (active_predicates.east) -- node[anchor=south] {No} ++(2cm,0) -| (fail.north);
+
+\draw [arrow] (generate_problem) -- (plan);
+\draw [arrow] (plan) -- (done);
+\draw [arrow] (done) -- node[anchor=east] {Yes} (read_plan);
+\draw [arrow] (done.east) -- node[anchor=south] {No} ++(2cm,0) -| (fail.north);
+
+\end{tikzpicture}

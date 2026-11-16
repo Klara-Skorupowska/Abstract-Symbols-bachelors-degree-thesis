@@ -1,0 +1,74 @@
+%% theory
+% the embodiment
+% the symbol emergence - for action not communication
+% algorithm? Konidaris 
+% changes inspired by brain's biology
+% -> GNG as similar came from SOM which came from bulding models of biological neural systems
+% -> data from camera is preproccess using cones (RGB values) and retinal ganglion cells (edges)
+
+\section{Theoretical Foundations} \label{chapter:theory}
+
+% In this project, an embodied agent abstracts grounded symbols as a Growing Neural Gas (GNG) representations.
+% Embodied cognition, the Symbol Grounding Problem, and the GNG algorithm have been around since the 1990s. Despite their maturity, these concepts remain relevant because Embodied Cognition was not contradicted, the Symbol Grounding Problem not solved, and even though GNG algorithm has its optimised successors, its foundational principles hold up well. I have chosen those methods to minimise the unnecessary complexity and focus on demonstrating, how abstract symbols can come from simple actions and methods. 
+
+\subsection{Embodied Cognition} \label{chapter:theory:embodied}
+% what it is
+According to the movement of embodied cognition, embodiment is inseparable part of the cognition \parencite{varela2017embodied}. This stands in opposition to more classical cognitive science, representing computational theory of mind, where brain is a processor that handles abstract information \parencite{pylyshyn1984computation}. 
+
+% characteristics that i use 
+To formalise the term of embodied cognition, \textcite{Wilson2002} introduced the six views. It is six statements that define what it means for the cognition to be embodied. In the context of this project the most interesting one is the fifth, although rest of them are also fulfilled. 
+
+\checkthis{Should I write about all six, or at least them all?}
+
+The fifth view: Cognition is for action. This means that the mind's function is to guide action. Every mechanism, process or representation within the mind has to come from the need of planning or executing actions. Mind's main task is to control the movement of the body in an environment and ensure its survival.
+
+% criticism
+Embodied cognition is criticized. Radical variants of embodied cognition face significant theoretical challenges. For example, by the poverty of stimulus argument, which states that there is not enough information and structure in environment to solve cognitive problems \parencite{milkowski2017situatedness}. Miłkowski settles on a hypothesis that for cognition both realms are important, embodiment and computations. Embodied experimental designs do lead to interesting discoveries, but not all cognitive processes can be explained by it. 
+
+% how do I use it
+This project focuses on what embodiment can do. Specifically, the agent learns to perceive its environment through action-oriented predicates. Each symbol emerges because some skill needs it. 
+
+\subsection{Symbol Grounding Problem and Symbol Emergence} \label{chapter:theory:SGP}
+% what it is
+Symbol Grounding Problem (SGP) was introduced by \textcite{harnad1990symbol}. His starting point is computational theory of mind that looks at a brain as open-loop computing machine that operates within symbol systems. He drew attention to the meanings of those symbols, arguing that any interpretation for them, must be extrinsic to the system. He compares understanding such symbols to learning Chinese solely from the Chinese dictionary. Every attempt to find a meaning leads only to more symbols, that still lack the meaning. The Grounding Problem asks the question if there is a mechanism that allows finding the meanings of symbols without escaping the system, therefore making them intrinsic to it. This is one side of the problem, in a context of robotics and cognitive modelling, the essential challenge is not only symbol grounding but also symbol emergence: not only how to find the meaning of existing symbols, but how meaningful symbols arise, evolve, and become organized through social and embodied interaction \parencite{taniguchi2016symbol}.
+
+% characteristics that i use
+Harnad himself proposed a solution to SGP \parencite{harnad1990symbol}. The mind grounds symbols in environment by creating iconic or categorical representations. It is a mechanism of associating the sensations with objects causing them. An object is then described in terms of sensory projection: as a representative point in perceptual space (an icon) or multiple points' invariants (a category). Even though, Harnad do not point out what triggers this mechanism, Peirce’s pragmatism effectively addresses this issue. It ties objects and their characteristics with actions they are associated with \parencite{kato2026pragmatism}. 
+
+% criticism
+This and other solutions, from different angles, were proposed, yet the problem remain opened. \textcite{taddeo2005solving} conducted a review of 15 years of solving the SGP. They concluded that explanations rely on pre-installed or other way given semantic resources. 
+
+% how do I use it
+This project likewise depends on external structures and symbol manipulation. The skills and actions are pre-coded, but symbols emerge. Those symbols, essential for operating within an environment, are obtained by repetitive discovery of possible sensory projections and binding them to the actions, they are not pre-installed but learned through interaction with an environment. The symbols are then used for planning and executing a task using planning algorithms.
+
+\subsection{Sensory Input: Visual Processing} \label{chapter:theory:visuals}
+Biological sensory input is processed through neural paths before it reaches the brain. Even there, this early processed input can be further manipulated. \parencite{crick2003framework}. The robot under consideration has two types of sensors: LIDARs and RGB camera. Since humans do not possess anything remotely like the LIDARs, I focus on the vision.
+
+% what it is
+The subject of recognising colours is described by \textcite{livingstone1988segregation}. They described how the eyes and the brain analyse visual input. Colour is perceived by the cells in the retina called cones. There are three types of cones: red-, green- and blue-sensitive. This is enough to distinguish between colours. 
+
+Another type of processing that happens at retinal level is detecting the differences in light saturation. They allow us to see the edges of objects in our visual field. Those cells are called retinal ganglion cells, and they form receptive fields. A receptive field has two areas: the on-centre and the off-centre. If the on-centre cells perceive more photons than the off-centre ones, the on-centre is activated. If the off-centre perceives more, the off-centre is activated. If both perceive the same amount, there is no activation \parencite{kuffler1953discharge}.
+
+% criticism
+Kuffler assumed some things that were proven wrong. First example is the linearity of the ganglion cell receptive fields. \textcite{enroth1966contrast} proved that this is an oversimplification. Complete linearity means that the linear change in lighting is translated to the linear reaction of the cells in full input range. Yet some receptive fields are more sensitive to darkness, some to brightness. 
+
+Another example of known flaw in Kuffler’s model is the laboratory setting of creating it. Keffler used tiny spots of light on anesthetised cat’s retina. Yet in natural condition, the lighting changes, the eye moves. Later it was proven that the receptive fields adapt dynamically to those changing conditions \parencite{smirnakis1997adaptation}.
+
+% characteristics that i use 
+Even though Keffler's model is a huge oversimplification, it is still a basis for the next models. I decided to use this simple model in this project, since it is a proof of concept.
+
+% how do I use it
+For this project, the visual information from RGB camera matrix is translated to activation of red, blue, and green cones, and activation of on-centre and off-centre fields. Such pre-processed visual information is passed further to the symbol emergence algorithm. 
+
+\subsection{Symbol Representation: Growing Neural Gas} \label{chapter:theory:GNG}
+% what it is
+Symbolic representations describe raw sensory input in a more abstract way enabling reasoning, planning, and acting. In the philosophy of mind, the ontological status of representations is a subject of debate. \textcite{fodor1975language} proposed that the mind is a symbolic system, and that mental representations are symbolic. \textcite{smolensky1988proper} argued that those representations are not symbolic, but rather subsymbolic. In this connectionists view, representations are not discrete symbols, but rather continuous patterns of activation in neural networks. Radical anti-representationalists and enactive paradigms argue that the thoughts are neither symbolic nor subsymbolic, but rather non-representational. They are patterns of sensorimotor activity \parencite{brooks1991intelligence}. 
+
+% characteristics that i use
+This work assumes that the representations are subsymbolic. The representations can be presented as a topological map of the perceptual space and manipulated in a symbolic manner.
+
+% the math / computer science
+A well-established algorithm for creating topological maps is the Self-Organizing Map (SOM) algorithm.\parencite{ritter1989som, kohonen1982self}. It assumes fixed structure of the map, such as a grid. Then it is trained to represent the input space by adjusting positions of the existing nodes. The Growing Neural Gas (GNG) algorithm \parencite{fritzke1994gng} extends the SOM framework. It does not assume a predefined structure. It starts with two nodes, grows by adding new ones in areas of high error, and removes ones in unvisited areas. This allows the GNG to adapt to the input space and represent it more accurately.
+
+% how do I use it
+In this project, the GNG algorithm encodes sensory observations corresponding to successful executions of skills. Then, symbols relevant for the task are abstracted through the mathematical operations on these topological maps.

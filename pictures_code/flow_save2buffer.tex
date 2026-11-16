@@ -1,0 +1,26 @@
+\begin{tikzpicture}[node distance=1.6cm]
+% nodes
+\node (start) [startstop] {Save to Buffer};
+
+\node (add_to_buffer) [process, below of=start] {Add to Buffer};
+
+\node (full) [decision, below of=add_to_buffer] {Buffer Full?};
+
+\node (update_predicates) [subroutine, below of=full, yshift=-0.5cm] {Update Raw Predicates};
+
+\node (update_symbols) [subroutine, below of=update_predicates] {Update Symbol Table};
+
+\node (generate_domain) [subroutine, below of=update_symbols] {Generate Domain File};
+
+\node (end) [startstop, below of=generate_domain] {Return};
+
+%arrows
+\draw [arrow] (start) -- (add_to_buffer);
+\draw [arrow] (add_to_buffer) -- (full);
+\draw [arrow] (full.east) -- ++(1.5,0) node[anchor=south] {No} -- ++(0,-3.2) |- (end.east);
+\draw [arrow] (full.south) -- node[anchor=east] {Yes} (update_predicates.north);
+\draw [arrow] (update_predicates) -- (update_symbols);
+\draw [arrow] (update_symbols) -- (generate_domain);
+\draw [arrow] (generate_domain) -- (end);
+
+\end{tikzpicture}

@@ -1,0 +1,143 @@
+\documentclass{article}
+\usepackage{amsmath}  %math package for mathematical symbols and environments
+\usepackage{amssymb}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{subcaption}
+\usepackage{pgffor} % for loop
+\usepackage{xstring} % for dealing with underline (_)
+\usepackage{tikz} % for flowcharts 
+\usetikzlibrary{shapes.geometric, arrows, arrows.meta, calc, positioning, intersections}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{adjustbox} % for fitting thing into a page
+\widowpenalties 1 10000 % for not splitting acapites
+\usepackage[style=apa, backend=biber]{biblatex}
+\addbibresource{sources.bib}
+
+% ---- Title / date ---
+\title{Action-Grounded Symbols: Abstracting Symbols from Skills in a Mobile Robot}
+\author{Klara Skorupowska}
+\date{2026}
+
+% ---- Code Listings Styles ----
+% Define colors suitable for academic code listings
+\definecolor{codegreen}{rgb}{0.1,0.5,0.1}
+\definecolor{codepurple}{rgb}{0.5,0,0.5}
+\definecolor{codeblue}{rgb}{0.1,0.2,0.7}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97}
+
+% Define PDDL language for listings
+\lstdefinelanguage{PDDL}{
+  sensitive=false, % PDDL is case-insensitive
+  morecomment=[l]{;}, % Comments start with a semicolon
+  morestring=[b]", % Strings (if any)
+  % Core PDDL keywords
+  morekeywords={
+    define, domain, problem,
+    :requirements, :types, :constants, :predicates, :functions,
+    :action, :parameters, :precondition, :effect,
+    :objects, :init, :goal, :metric
+  },
+  % Logic operators & qualifiers
+  morekeywords=[2]{
+    and, or, not, exists, forall, when,
+    increase, decrease, total-cost
+  }
+}
+
+% Global styling for listings
+\lstset{
+  language=PDDL,
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegreen}\itshape,
+  keywordstyle=\color{codeblue}\bfseries,
+  keywordstyle=[2]\color{codepurple}\bfseries,
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=left,
+  numbersep=8pt,
+  numberstyle=\tiny\color{gray},
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=single,
+  rulecolor=\color{lightgray}
+}
+
+% flow chart styles
+% ---- Colours ----
+\definecolor{orange}{HTML}{E6661A}
+\definecolor{green}{HTML}{66CC66}
+\definecolor{blue}{HTML}{1A80CC}
+\definecolor{yellow}{HTML}{E6CC33}
+\definecolor{black}{HTML}{26262E}
+
+% ---- Flowchart Components ----
+\tikzset{
+    startstop/.style = {rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!20},
+    process/.style   = {rectangle, minimum width=3.5cm, minimum height=1cm, text centered, draw=black, fill=yellow!20},
+    io/.style        = {trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!15},
+    subroutine/.style= {rectangle, draw=black, fill=yellow!20, minimum width=3.5cm, minimum height=1cm, text centered, double},
+    decision/.style  = {diamond, aspect=2, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!20},
+    arrow/.style     = {thick, ->, >=stealth}
+}
+
+\begin{document}
+% ---- debug helpers ----
+\newcommand{\todo}[1]{%
+  \colorbox{green}{[TODO: #1]}\\%
+}
+\newcommand{\checkthis}[1]{
+        \colorbox{yellow}{(Is it ok?: #1)}
+}
+
+\maketitle
+\newpage
+\begin{center}
+    \textbf{Abstract}
+\end{center}
+\input{00_abstract}
+\vspace{0.5cm}
+
+\textbf{Key words:} artificial intelligence, abstract symbols, computational cognitive science
+
+\newpage
+\tableofcontents
+
+
+% --- The structure ---
+% Introduction: the goal, the problems, used methods, why it's important
+\newpage
+\input{01_intro}
+% Theory: symbol grounding problem, abstracting symbols, phylosophy and engineering
+\newpage
+\input{02_theory}
+% The idea: the high level idea, where ideas are from
+\newpage
+\input{03_idea}
+% Implementation: all messy stuff like simulation and code etc.
+\newpage
+\input{04_implementation}
+% Results: some nice graphs and stats
+\newpage
+\input{05_results}
+% Discussion: did I succeed? what does it mean?
+\newpage
+\input{06_discussion}
+
+% --- Apendices ---
+\appendix
+\newpage
+%\input{A01_symbols}
+
+
+\newpage
+% Bibliografia
+\printbibliography
+
+\end{document}

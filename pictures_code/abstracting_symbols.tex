@@ -1,0 +1,117 @@
+\begin{tikzpicture}[
+    pointer/.style={line width=1pt, black},
+    % Reusable 3-circle Venn geometry (takes radius and offset as arguments or macros)
+    venn3/.pic={
+        \fill (150:\vennOffset) circle (\vennRadius);
+        \fill (30:\vennOffset)  circle (\vennRadius);
+        \fill (270:\vennOffset) circle (\vennRadius);
+    }
+]
+    % --- 0. LAYOUT & GEOMETRY PARAMETERS ---
+    % Circle geometry
+    \pgfmathsetmacro{\vennRadius}{0.72}
+    \pgfmathsetmacro{\vennOffset}{0.42}
+    
+    % Vertical row positions (Y)
+    \pgfmathsetmacro{\rowOneY}{0.0}
+    \pgfmathsetmacro{\rowTwoY}{-1.5}
+    \pgfmathsetmacro{\rowThreeY}{-3.0}
+    
+    % Horizontal positions & offsets (X)
+    \pgfmathsetmacro{\leftColX}{0.0}
+    \pgfmathsetmacro{\rightColX}{2.0}
+    \pgfmathsetmacro{\centerX}{(\leftColX + \rightColX)/2}
+    
+    \pgfmathsetmacro{\midOverlapOffset}{0.2}  % Distance from centerX for row 2
+    \pgfmathsetmacro{\botSpreadOffset}{1.1}   % Distance from centerX for row 3
+    \pgfmathsetmacro{\diffShift}{1.0}         % Subtraction cutout shift in row 3
+    \pgfmathsetmacro{\calloutX}{3.7}          % X-alignment for right-side text labels
+
+    % Define center coordinates for every element
+    \coordinate (top_left)  at (\leftColX, \rowOneY);
+    \coordinate (top_right) at (\rightColX, \rowOneY);
+    
+    \coordinate (mid_left)  at (\centerX - \midOverlapOffset, \rowTwoY);
+    \coordinate (mid_right) at (\centerX + \midOverlapOffset, \rowTwoY);
+    \coordinate (mid_center) at (\centerX, \rowTwoY);
+    
+    \coordinate (bot_left)  at (\centerX - \botSpreadOffset, \rowThreeY);
+    \coordinate (bot_right) at (\centerX + \botSpreadOffset, \rowThreeY);
+
+
+    % --- 1. TOP ROW: PRECONDITION & EFFECT VENN DIAGRAMS ---
+    \node[font=\small] at ([yshift=1.35cm]top_left) {precondition};
+    \pic[fill=yellow, fill opacity=0.35] (pre_venn) at (top_left) {venn3};
+
+    \node[font=\small] at ([yshift=1.35cm]top_right) {effect};
+    \pic[fill=blue, fill opacity=0.35] (eff_venn) at (top_right) {venn3};
+
+
+    % --- 2. MIDDLE ROW: OVERLAPPING INTERSECTIONS ---
+    \begin{scope}[shift={(mid_left)}]
+        \clip (150:\vennOffset) circle (\vennRadius);
+        \clip (30:\vennOffset)  circle (\vennRadius);
+        \fill[yellow, fill opacity=0.5] (270:\vennOffset) circle (\vennRadius);
+    \end{scope}
+
+    \begin{scope}[shift={(mid_right)}]
+        \clip (150:\vennOffset) circle (\vennRadius);
+        \clip (30:\vennOffset)  circle (\vennRadius);
+        \fill[blue, fill opacity=0.5] (270:\vennOffset) circle (\vennRadius);
+    \end{scope}
+
+
+    % --- 3. BOTTOM ROW: SET DIFFERENCES (SYMBOLS) ---
+    % Left: Yellow intersection minus Blue intersection
+    \begin{scope}[shift={(bot_left)}]
+        \clip (150:\vennOffset) circle (\vennRadius);
+        \clip (30:\vennOffset)  circle (\vennRadius);
+        \clip (270:\vennOffset) circle (\vennRadius);
+        \begin{scope}[shift={(\diffShift, 0)}, even odd rule]
+            \clip (-2,-2) rectangle (2,2) (150:\vennOffset) circle (\vennRadius);
+            \fill[yellow, fill opacity=0.8] (-2,-2) rectangle (2,2);
+        \end{scope}
+    \end{scope}
+
+    % Right: Blue intersection minus Yellow intersection
+    \begin{scope}[shift={(bot_right)}]
+        \clip (150:\vennOffset) circle (\vennRadius);
+        \clip (30:\vennOffset)  circle (\vennRadius);
+        \clip (270:\vennOffset) circle (\vennRadius);
+        \begin{scope}[shift={(-\diffShift, 0)}, even odd rule]
+            \clip (-2,-2) rectangle (2,2) (30:\vennOffset) circle (\vennRadius);
+            \fill[blue, fill opacity=0.8] (-2,-2) rectangle (2,2);
+        \end{scope}
+    \end{scope}
+
+
+    % --- 4. FLOW ARROWS (Relative to centers) ---
+    \draw[arrow] ([yshift=-0.30cm]top_left)  -- ([xshift=-0.25cm, yshift=0.45cm]mid_left);
+    \draw[arrow] ([yshift=-0.30cm]top_right) -- ([xshift=0.25cm,  yshift=0.45cm]mid_right);
+
+    \draw[arrow] ([xshift=-0.10cm, yshift=-0.25cm]mid_left)  -- ([xshift=-0.10cm, yshift=0.45cm]bot_left);
+    \draw[arrow] ([xshift=0.10cm,  yshift=-0.25cm]mid_right) -- ([xshift=0.10cm,  yshift=0.45cm]bot_right);
+
+
+    % --- 5. CALLOUT POINTERS & LABELS (Relative to centers) ---
+    \coordinate (p1) at ([xshift=0.55cm, yshift=0.35cm]top_right);
+    \draw[pointer] (p1) -- (p1 -| \calloutX, 0) 
+        node[right, align=left, xshift=3pt] {experienced effects};
+    
+    \coordinate (p2) at (top_right);
+    \draw[pointer] (p2) -- (p2 -| \calloutX, 0) 
+        node[right, align=left, anchor=north west, yshift=5pt, xshift=3pt] {common for all experiences};
+    
+    \coordinate (p3) at ([yshift=-0.05cm]mid_center);
+    \draw[pointer] (p3) -- (p3 -| \calloutX, 0) 
+        node[right, align=left, anchor=north west, yshift=5pt, xshift=3pt] {static through\\ execution of a skill};
+    
+    \coordinate (p4) at ([xshift=0.10cm, yshift=0.15cm]bot_right);
+    \draw[pointer] (p4) -- (p4 -| \calloutX, 0) 
+        node[right, align=left, xshift=3pt] {symbol for effect};
+    
+    \coordinate (p5) at ([xshift=-0.05cm, yshift=-0.25cm]bot_left);
+    \draw[pointer] (p5) -- (p5 -| \calloutX, 0) 
+        node[right, align=left, xshift=3pt] {symbol for precondition};
+    
+\end{tikzpicture}
