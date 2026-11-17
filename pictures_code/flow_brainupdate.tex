@@ -1,0 +1,34 @@
+\begin{tikzpicture}[node distance=1.6cm]
+
+% nodes
+\node (start) [startstop] {Brain Update};
+
+\node (loop_buffer) [decision, below of=start, yshift=-0.5cm] {Next Item in Buffer?};
+
+\node (update_gng_init) [subroutine, below of=loop_buffer, yshift=-0.8cm] {Update Initial Predicate};
+
+\node (update_gng_eff) [subroutine, below of=update_gng_init] {Update Effect Predicate};
+
+\node (collect_skill) [process, below of=update_gng_eff,] {Add skill do \textit{updated skills}};
+
+\node (abstract) [subroutine, left of=loop_buffer, xshift=-5cm] {Abstract Symbols for \textit{updated skills}};
+
+\node (save_domain) [subroutine, below of=abstract] {Generate and Save PDDL Domain};
+
+\node (end) [startstop, below of=save_domain] {Return};
+
+% arrows
+\draw [arrow] (start) -- (loop_buffer);
+
+% loop body
+\draw [arrow] (loop_buffer) -- node[anchor=east] {Yes} (update_gng_init);
+\draw [arrow] (update_gng_init) -- (update_gng_eff);
+\draw [arrow] (update_gng_eff) -- (collect_skill);
+\draw [arrow] (collect_skill) -- ++(3cm,0) |- (loop_buffer.east);
+
+% post-loop
+\draw [arrow] (loop_buffer.west) -- node[anchor=south] {No} (abstract.east);
+\draw [arrow] (abstract) -- (save_domain);
+\draw [arrow] (save_domain) -- (end);
+
+\end{tikzpicture}

@@ -1,11 +1,8 @@
 %% implmentation, the messy part
 
 \section{Implementation} \label{chapter:implement}
-
-\todo{big change - need to change a lot of this}
-
 Algorithm is implemented in Python using PyBullet simulation. The program keeps the simulation and the logic completely separated. 
-This way the simulation keeps the realism of operating within the real environment. Thus the program consists of three main part: simulation, agent and supervisor. 
+This way the simulation keeps the realism of a robot operating within the real environment. The program consists of three main modules: simulation, agent and supervisor. 
 Each module is run in separate thread, mimicking the ROS nodes.
 Modules communicate through the bus,  using services and broadcasting.  \\
 Simulation module generate the environment and control physics. 
@@ -14,8 +11,9 @@ Agent module has implementations of operating logic, abstracting symbols, updati
 This chapter provides an overview of the system architecture and the methods employed in the implementation. The full source code repository is available online \parencite{skorupowska_symbols}.
 
 \subsection{Environment}
-A robot is a simplified version of e-Puck 2 (Figure \ref{fig:sim:robot}). It resembles its shape and have the same set of sensors and actuators. 
-The only actuators are two differential wheels, which makes the robot to move non-holonomically. The sensors are: 8 LIDARs with range from 0 to 10 cm and a RGB camera with matrix of \(120 \times 160\) pixels.
+A robot is a simplified version of e-Puck 2, shown on figure \ref{fig:sim:robot}). It resembles its shape and have the same set of sensors and actuators. 
+
+The actuators are two differential wheels, which enables the robot to move non-holonomically. The sensors are: 8 LIDARs with range from 0 to 10 cm and a RGB camera with matrix of \(120 \times 160\) pixels.
 
 \begin{figure}[htbp]
     \centering
@@ -24,9 +22,10 @@ The only actuators are two differential wheels, which makes the robot to move no
     \label{fig:sim:robot}
 \end{figure}
 
-The arena (Figure \ref{fig:sim:arena}) for the task consist of two rooms separated by the wall. Each room has different coloured floor so the robot is able to different between them using only its sensors. 
-In the separating wall there is a contrasting door. The door swings open on the push of the robot. 
-Robot's task originate in orange room, then in second room, the blue one, there is contrasting post, which robot is supposed to reach.
+The arena, shown on figure \ref{fig:sim:arena}, consist of two rooms separated by the wall. Each room has different colored floor (orange and blue) so the robot is able to different between them using its sensors. 
+In the separating wall there is a portal with a green door. The door swings open on the push of the robot. 
+In the second room there is a yellow post.
+The characteristics of the arena enable the robot to navigate between the rooms.
 
 \begin{figure}[htbp]
     \centering
@@ -36,107 +35,182 @@ Robot's task originate in orange room, then in second room, the blue one, there 
 \end{figure}
 
 \subsection{Supervisor}
-Next module updates the data for all the debugging figures and answers robot's questions through the bus. This is the implementation of supervision within the learning. 
-The supervisor has knowledge beyond robot's perception and can modulate both the environment and robot. 
-The main task of a supervisor in the learning process is checking if a skill was executed successfully, Each skill has some conditions of success and failure. 
-This is similar to what is being learned, but the difference is that those are formulated in terms of the outsider. The outsider can have different sensors or simply different point of reference. 
-For example, the supervisor knows in which room the robot is, the robot does not. The skill 'start' can be executed anywhere, has no precondition, but is finished successfully only if the robot is in the orange room.
-Supervisor checks this condition and returns to the agent if it succeed.
+The \textit{Supervisor} module updates the data for data visualisation and answers questions asked by the robot through the bus. This is the implementation of a supervision within the learning. 
+
+The supervisor has knowledge beyond perception of the robot and can modulate both the environment and the robot. 
+The main task of a supervisor in the learning process is checking if a skill was executed successfully. 
+This is, in some sense, similar to what is being learned, but it is formulated in terms of the outsider. The outsider can have different sensors or simply different point of reference. For example, the supervisor knows in which room the robot is, the robot does not. If a skill demands being in a second room, supervisor checks this condition and the agent learns to represent it in its own perceptual space as seeing the color blue.
+
+\subsection{The task}
+Emergence of symbols is task-specific as symbols depends on skills available in skillset and the goal. In this implementaion the task is trivial for a human: find a yellow post in two room arena. As can be seen on figure \ref{fig:sim:arena}, the arena is very simple. This implementation test the framework on utmost simple setting.
+
+Table \ref{tab:skills} shows the skills in skillset, as well as their limitations known by the Supervisor. Zones considered by Supervisor are shown on figure \ref{fig:sim:zones}. Besides shown limitations, each skill has an obstacle avoidance mechanism.
+\begin{table}[htbp]
+    \centering
+    \caption{Overview of learned skills, their descriptions, and initial and final conditions checked by the Supervisor.}
+    \label{tab:skills}
+    \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+        \begin{tabularx}{\textwidth}{@{}
+            l 
+            >{\hsize=1.7\hsize\raggedright\arraybackslash}X 
+            >{\hsize=0.65\hsize\raggedright\arraybackslash}X 
+            >{\hsize=0.65\hsize\raggedright\arraybackslash}X
+          @{}}
+            \toprule
+            \textbf{Skill Name} & \textbf{Behavior} & \textbf{Initial} & \textbf{Final} \\
+            \midrule
+            \texttt{find\_door} & rotating until green is in the center of vision & none & facing the door \\
+            \midrule
+            \texttt{approach\_door} & aproaching the green object while keeping it centered; stops within given distance & facing the door & facing the door, at given distance \\
+            \midrule
+            \texttt{open\_door} & going through the door by pushing them open, stops by leaving a door zone & facing the door, within a door zone & outside a door zone, in the second room \\
+            \midrule
+            \texttt{find\_goal} & rotating until yellow is in the center of vision & none & facing the goal \\
+            \midrule
+            \texttt{approach\_goal} & aproaching the yellow object while keeping it centered; stops within given distance & facing the goal, in the second room & facing the goal, at given distance, within a goal zone \\
+            \midrule
+            \texttt{finish} & none & in a goal zone, facing the goal & none \\
+            \bottomrule
+        \end{tabularx}
+    }
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth, height=0.85\textheight, keepaspectratio]{pictures/przeddrzwi.png}
+    \caption{View on the ongoing simulation. Supervisor enforced zones visible around door and goal.} 
+    \label{fig:sim:zones}
+\end{figure}
 
 \subsection{Agent}
-This module consist of the main logic loop, the networks for predicates and transitions, and low-level skills. 
+This module contains the main logic loop, predicates architecture and low-level skills implementations.
 
-\subsubsection*{Predicates} 
-Predicates are represented by Supervised Growing Neural Gas. These are implementation of basic GNG \textcite{fritzke1994gng} with added behaviour for negative points. 
-The original algorithm was for unsupervised learning, and mapped space from collected points. Since the execution can be successful or not, 
-I added a reverse logic for negative points, symmetrical to treating positive ones. If a point considered is positive, the neural gas points are pulled to it. 
-If it is negative, they are pushed away. 
-\todo{add parameters with explanation for them}
+\subsubsection*{Predicates Architecture}
+Symbols and predicates are saved as GNG objects in a \textit{Brain} structure. Overflow of the buffer collecting data triggers a brain update, as shown on figure \ref{fig:brainupdate}. Each \textit{experience} ($Exp^{A_i}_k$) leads to updating both predicates ($P^{A_i}_{init}$ and $P^{A_i}_{eff}$) following standard GNG implementation \parencite{fritzke1994gng}. A variable \textit{updated skills} collects all skills $A_i$ that occured in a buffer. Then, the symbols for skills in \textit{updated skills} are recalculated ($Q^{A_i}_{init}$ and $Q^{A_i}_{eff}$). Next, all symbols are re-partitioned into disjoint sets ($Q_j$). Finally, the new domain PDDL file is generated, as it directly describes how skills interact with an environment represented by current symbols.
 
-\subsubsection*{Transition graph} 
-The transition graph is represented by a standard directed graph. It plays no role in the learning process. This graph is used for generating PDDL files.  
-The transitions are collected from the overlapping points of effects and preconditions and generated after each update to either of them.  
+\begin{figure}[htbp]
+    \centering
+    \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+        \input{pictures_code/flow_brainupdate.tex}
+    }
+    \caption{A flowchart of the \textit{brain} update process. Updating includes inserting new prototype nodes in predicates (memories) and recalculating symbols.} 
+    \label{fig:brainupdate}
+\end{figure}
+
+\subsubsection*{Hyperparameters}
+Learning process is dicated by hyperparameters of GNG and symbol abstracting process. Table \ref{tab:hyperparam} presents them and briefly describes their influence on resulting symbols. Each hyperparameter affect level of generalization of the symbols, computational time, and adaptations to dynamic environment.
+\begin{table}[htbp]
+    \centering
+    \caption{Influence of Growing Neural Gas (GNG) and symbol abstraction hyperparameters on the resulting symbolic representations.}
+    \label{tab:hyperparam}
+  \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+      \begin{tabularx}{\textwidth}{@{} l l X @{}}
+          \toprule
+          \textbf{Parameter} & \textbf{Default} & \textbf{Influence on Resulting Symbols} \\
+          \midrule
+          \multicolumn{3}{@{}l}{\textit{Symbol Abstraction \& Partitioning Parameters}} \\
+          \midrule
+          \texttt{precision} & $0.95$ & Sets the minimum Voronoi overlap ratio required to treat two symbols as equivalent. Higher values produce more precise symbols; lower values allow more uncertainity. \\
+          \texttt{n\_test\_points} & $100$ & Number of uniform Monte Carlo samples drawn within circumscribing bounding boxes to estimate Voronoi overlap. Higher values reduce variance in equivalence and partitioning checks at the cost of computation time. \\
+          \texttt{min\_nodes} & $2$ & Minimum number of GNG prototype nodes required for a non-empty set difference ($Q_{\text{init}}$, $Q_{\text{eff}}$, or partition remainder $Q'$) to form a valid symbol. Filters out noisy or residual boundary fragments. \\
+          \midrule
+          \multicolumn{3}{@{}l}{\textit{Growing Neural Gas (GNG) Topology \& Voronoi Granularity}} \\
+          \midrule
+          \texttt{max\_nodes} & $40$ & Upper bound on prototype nodes per predicate. Larger values allow better representation at risk of overfitting. \\
+          \texttt{base\_radius} & $0.1$ & Minimum activation radius of a Voronoi cell around a prototype node. Prevents overly narrow activation regions. \\
+          \texttt{max\_radius} & $1.0$ & Maximum activation radius of a Voronoi cell. Caps generalization in sparse regions of perceptual space. \\
+          \texttt{learning\_rate\_b} ($\epsilon_b$) & $0.2$ & Adaptation step size for the best-matching (winner) node. Higher values make symbols track recent experiences quickly; lower values stabilize prototype positions. \\
+          \texttt{learning\_rate\_n} ($\epsilon_n$) & $0.01$ & Adaptation step size for topological neighbors of the winner node. Controls topological smoothing across connected Voronoi cells. \\
+          \texttt{max\_edge\_age} & $15$ & Maximum age before an edge is pruned and isolated nodes are removed. Lower values forget unvisited regions faster, adapting symbols to environmental changes. \\
+          \texttt{lambda\_step} ($\lambda$) & $5$ & Number of experience updates between new node insertions. Lower values increase spatial resolution in high-error regions. \\
+          \texttt{alpha} ($\alpha$) & $0.7$ & Error reduction factor applied to parent nodes upon inserting a new node. \\
+          \texttt{d} & $0.99$ & Exponential decay factor applied to accumulated node errors at each step. \\
+          \bottomrule
+      \end{tabularx}
+    }
+\end{table}
+
+\subsubsection*{Visual Preprocessing}
+The separation between agent and the simulation is reinforced by virtual actuators and sensors. Each virtual element communicate through the bus with its real counterpart. This way it is possible to move the logic from simulation to real robot without the need to decouple the two.
+
+The preprocessing described in chapter \ref{chapter:theory:visuals} is done within virtual sensors. The flow of this process is shown on figure \ref{fig:flow_preprocess}. A virtual camera sensor recives an RGB pixel matrix (160x120) from real camera sensor. Then, the matrix is partitioned into 20x20 cell grid with 10x10 center. For each cell normalized mean RGB and center-surround contrast is extracted. The activation for on/off-center cells is based on global threshold from previous frame. Finally, the global Weber threshold \parencite{weber1996eh} is updated, and encoded vector returned. 
+
+\begin{figure}[htbp]
+    \centering
+    \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+        \input{pictures_code/flow_preprocess.tex}
+    }
+    \caption{A flowchart of preprocessing raw data from the camera sensor. RGB matrix is transformed into cone cells activations and retinal ganglion cells activations.} 
+    \label{fig:flow_preprocess}
+\end{figure}
+
+\subsubsection*{Low-level Skills}
+This implementation uses mannually coded skills. The skillset is described in table \ref{tab:skills}. Each skill execution returns a boolean value marking its success or failure. Skills use virtual sensors and actuators to avoid blurring the wall between the agent and the simulation, and enable moving the code into a real robot. Communication with the Supervisor is conducted within the skill execution in order to evaluate its outcome.
 
 \subsubsection*{PDDL files} 
-PDDL files are generated by simple, structural code. Each time the predicates are updated, the new problem and domain files are generated. 
-The domain file (Listing \ref{lst:pddl:domain}) defines the world for an agent. What can be seen (predicates) and what can be done (actions). In this domain there are as many actions as skills, and for each skill two types of predicates: can-run-skill and executed-skill. This way we cover both starting conditions for a skill and its effect.
-The problem file (Listing \ref{lst:pddl:problem}) specify the domain and the predicates that are fulfilled at the beginning and the predicates that need to be fulfilled at the end.
-   
-\begin{lstlisting}[caption={Problem definition in PDDL}, label={lst:pddl:problem}]
-(define (problem plan_problem)
-  (:domain robot_domain)
-  (:init
-    (can_run_Start)
-  )
-  (:goal
-    (executed_Finish)
-  )
-)
-\end{lstlisting}
+Main goal for this project is symbol abstracting, yet to show their utility they are used in a planning task. Task is solved using Pyperplan Solver \parencite{alkhazraji2020pyperplan}. The domain file is generated after updating symbols. The problem file is generated each time the robot needs a plan. Listings \ref{lst:pddl:domain} and \ref{lst:pddl:problem} show examples of those files. As can be seen, the planner sees an environment in terms of generated symbols and given skillset.
 \begin{lstlisting}[caption={Domain definition in PDDL}, label={lst:pddl:domain}]
 (define (domain robot_domain)
   (:requirements :strips)
   (:predicates
-    (can_run_Open_the_Door)
-    (executed_Open_the_Door)
-    (can_run_Start)
-    (executed_Start)
-    (can_run_Finish)
-    (executed_Finish)
-    (can_run_Go_to_the_Goal)
-    (executed_Go_to_the_Goal)
-    (can_run_Go_to_the_Door)
-    (executed_Go_to_the_Door)
-    (can_run_Find_the_Door)
-    (executed_Find_the_Door)
-    (can_run_Find_the_Goal)
-    (executed_Find_the_Goal)
+    (sym_0)
+    (sym_1)
+    (sym_10)
+    (sym_2)
+    (sym_5)
+    (sym_6)
+    (sym_7)
   )
 
-  (:action Open_the_Door
+  (:action approach_door
     :parameters ()
-    :precondition (can_run_Open_the_Door)
-    :effect (and (executed_Open_the_Door) (can_run_Find_the_Door) (can_run_Find_the_Goal) (not (can_run_Open_the_Door)))
+    :precondition (and (sym_2))
+    :effect (and (sym_6) (not (sym_2)))
   )
 
-  (:action Start
+  (:action approach_goal
     :parameters ()
-    :precondition (can_run_Start)
-    :effect (and (executed_Start) (can_run_Find_the_Door) (not (can_run_Start)))
+    :precondition (and (sym_2))
+    :effect (and (sym_10) (not (sym_2)))
   )
 
-  (:action Finish
+  (:action find_door
     :parameters ()
-    :precondition (can_run_Finish)
-    :effect (and (executed_Finish) (not (can_run_Finish)))
+    :precondition (and (sym_2))
+    :effect (and (sym_2))
   )
 
-  (:action Go_to_the_Goal
+  (:action find_goal
     :parameters ()
-    :precondition (can_run_Go_to_the_Goal)
-    :effect (and (executed_Go_to_the_Goal) (can_run_Finish) (can_run_Find_the_Door) (can_run_Find_the_Goal) (not (can_run_Go_to_the_Goal)))
+    :precondition (and (sym_2))
+    :effect (and (sym_2))
   )
 
-  (:action Go_to_the_Door
+  (:action finish
     :parameters ()
-    :precondition (can_run_Go_to_the_Door)
-    :effect (and (executed_Go_to_the_Door) (can_run_Open_the_Door) (can_run_Find_the_Door) (not (can_run_Go_to_the_Door)))
+    :precondition (and (sym_0))
+    :effect (and (sym_5) (not (sym_0)))
   )
 
-  (:action Find_the_Door
+  (:action open_door
     :parameters ()
-    :precondition (can_run_Find_the_Door)
-    :effect (and (executed_Find_the_Door) (can_run_Go_to_the_Door) (not (can_run_Find_the_Door)))
-  )
-
-  (:action Find_the_Goal
-    :parameters ()
-    :precondition (can_run_Find_the_Goal)
-    :effect (and (executed_Find_the_Goal) (can_run_Go_to_the_Goal) (not (can_run_Find_the_Goal)))
+    :precondition (and (sym_7))
+    :effect (and (sym_1) (not (sym_7)))
   )
 )
 \end{lstlisting}
-
-\subsubsection*{Visual Preprocessing}
-
-\subsubsection*{Low-level Skills}
+\begin{lstlisting}[caption={Problem definition in PDDL}, label={lst:pddl:problem}]
+(define (problem plan_problem)
+  (:domain robot_domain)
+  (:init
+    (sym_13)
+  )
+  (:goal
+    (and (sym_5))
+  )
+)
+\end{lstlisting}

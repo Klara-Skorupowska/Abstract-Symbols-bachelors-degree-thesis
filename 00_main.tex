@@ -3,6 +3,8 @@
 \usepackage{amssymb}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{subcaption}
+\usepackage{booktabs} % for tabs
+\usepackage{tabularx}
 \usepackage{pgffor} % for loop
 \usepackage{xstring} % for dealing with underline (_)
 \usepackage{tikz} % for flowcharts 
@@ -15,10 +17,12 @@
 \usepackage[style=apa, backend=biber]{biblatex}
 \addbibresource{sources.bib}
 
+\usepackage{datetime2}
+
 % ---- Title / date ---
 \title{Action-Grounded Symbols: Abstracting Symbols from Skills in a Mobile Robot}
 \author{Klara Skorupowska}
-\date{2026}
+\date{Wygenerowano: \DTMnow}
 
 % ---- Code Listings Styles ----
 % Define colors suitable for academic code listings
@@ -56,11 +60,13 @@
   basicstyle=\ttfamily\footnotesize,
   breakatwhitespace=false,
   breaklines=true,
+  postbreak=\mbox{\textcolor{gray}{$\hookrightarrow$}\space},
   captionpos=b,
   keepspaces=true,
   numbers=left,
   numbersep=8pt,
   numberstyle=\tiny\color{gray},
+  columns=flexible
   showspaces=false,
   showstringspaces=false,
   showtabs=false,
@@ -93,7 +99,7 @@
   \colorbox{green}{[TODO: #1]}\\%
 }
 \newcommand{\checkthis}[1]{
-        \colorbox{yellow}{(Is it ok?: #1)}
+        \colorbox{yellow}{(Q: #1?)}
 }
 
 \maketitle

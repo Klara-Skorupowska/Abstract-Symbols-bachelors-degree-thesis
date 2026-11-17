@@ -1,0 +1,34 @@
+\begin{tikzpicture}[node distance=1.6cm]
+
+% nodes
+\node (start) [startstop] {Preprocess Camera Input};
+
+\node (prepare) [process, below of=start] {Partition into Cell Grid};
+
+\node (loop_check) [decision, below of=prepare, yshift=-0.8cm] {Unprocessed Cell?};
+
+\node (color) [process, below of=loop_check, yshift=-1.0cm] {Extract Normalized Mean RGB};
+
+\node (contrast) [process, below of=color] {Compute Center-Surround Contrast};
+
+\node (fire) [process, below of=contrast] {Apply Weber Threshold (ON/OFF-Center)};
+
+\node (update_threshold) [process, right of=loop_check, xshift=4cm, yshift=-1.6cm] {Update Weber Threshold};
+\node (return_coded) [startstop, below of=update_threshold] {Return Encoded Vector};
+
+% arrows
+\draw [arrow] (start) -- (prepare);
+\draw [arrow] (prepare) -- (loop_check);
+
+\draw [arrow] (loop_check) -- node[anchor=east] {Yes} (color);
+\draw [arrow] (color) -- (contrast);
+\draw [arrow] (contrast) -- (fire);
+
+% loop back arrow
+\draw [arrow] (fire.west) -- ++(-1.4cm,0) |- (loop_check.west);
+
+% exit loop arrow
+\draw [arrow] (loop_check.east) -- node[anchor=south] {No} ++(2.2cm,0) -| (update_threshold.north);
+\draw [arrow] (update_threshold) -- (return_coded);
+
+\end{tikzpicture}
