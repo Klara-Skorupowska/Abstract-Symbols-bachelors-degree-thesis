@@ -1,36 +1,6 @@
-% Results section
 \section{Results} \label{chapter:results}
-The main results of this project are symbolic preconditions and effects. Appendix~\ref{app:symbols} holds all obtained symbols. Figure~\ref{fig:finishinit} shows two types of representing 'Finish' skill precondition. First type, the iconic representation (fig.~\ref{fig:finishinit:icon}), shows median point of the GNG. Second type, the categorical representation (fig.~\ref{fig:finishinit:category}), shows the invariant dimensions for all the points in GNG. In this example, we see that to be able to finish successfully, the robot has to see yellow panel in front of him.
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.9\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{pictures/symbols/sym_6_icon.png}
-    \caption{Iconic representation}
-    \label{fig:finishinit:icon}
-  \end{subfigure}
-  \hfill % Adds flexible space pushing them to the edges
-  \begin{subfigure}[b]{0.9\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{pictures/symbols/sym_6_category.png}
-    \caption{Categorical representation}
-    \label{fig:finishinit:category}
-  \end{subfigure} 
-  \caption{'Finish' skill precondition symbolic representation. Two types of visualising obtained symbols: iconic and categorical.}
-  \label{fig:finishinit}
-\end{figure}
+The main goal of experiments on described framework was to obtain symbols that represent given environment in terms functional for given robot. Appendix~\ref{app:symbols} holds all obtained symbols.
 
-Those symbols are the result of executing the main loop 32,216 times in 10 sessions. Within those executions was exploration as well as planning. The brain was updated 12,887 times. Figure~\ref{fig:frequency} shows the frequency of brain updates through time. This shows that the more the agent knows the less frequent the updates are.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth, height=0.85\textheight, keepaspectratio]{pictures/update_kde.png}
-    \caption{Update frequency through all the sessions. For calculating the update density (frequency) the Kernel Density Estimation (KDE) was used.} 
-    \label{fig:frequency}
-\end{figure}
+\subsection{Experiments}
 
-The symbols dictate possible transitions between skills. As mentioned before, the transition is possible if an effect of preceding skill is within the precondition of following one. Figure~\ref{fig:transitons} shows the transitions deducted from the predicates. In given task the robot searched for the path from 'Start' to 'Finish'.
-
-\subsubsection*{Tests}
-For testing the planning was executed with fixed goal skill set to 'Finish'. The starting skill was chosen randomly among the active ones.
-
-% it get stuck in the conners and has no way to escape.
+\subsection{Symbols}
