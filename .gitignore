@@ -1,5 +1,18 @@
-/.vscode
-/00_main.bcf
-/00_main.run.xml
-/00_main.synctex.gz
-/*_old*
+# VS Code
+.vscode/
+
+# LaTeX build artifacts (all files, all subdirectories)
+*.aux
+*.bcf
+*.blg
+*.bbl
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Backup / old files
+*_old*
