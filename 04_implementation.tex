@@ -137,7 +137,21 @@ Learning process is dicated by hyperparameters of GNG and symbol abstracting pro
 \subsubsection*{Visual Preprocessing}
 The separation between agent and the simulation is reinforced by virtual actuators and sensors. Each virtual element communicate through the bus with its real counterpart. This way it is possible to move the logic from simulation to real robot without the need to decouple the two.
 
-The preprocessing described in chapter \ref{chapter:theory:visuals} is done within virtual sensors. The flow of this process is shown on figure \ref{fig:flow_preprocess}. A virtual camera sensor recives an RGB pixel matrix (160x120) from real camera sensor. Then, the matrix is partitioned into 20x20 cell grid with 10x10 center. For each cell normalized mean RGB and center-surround contrast is extracted. The activation for on/off-center cells is based on global threshold from previous frame. Finally, the global Weber threshold \parencite{weber1996eh} is updated, and encoded vector returned. 
+The preprocessing described in chapter \ref{chapter:theory:visuals} is done within virtual sensors. The flow of this process is shown on figure \ref{fig:flow_preprocess}. A virtual camera sensor recives an RGB pixel matrix (160x120) from real camera sensor. Then, the matrix is partitioned into 20x20 cell grid with 10x10 center. For each cell normalized mean RGB and center-surround contrast is extracted. The activation for on/off-center cells is based on global threshold from previous frame. Finally, the global threshold  is updated, and encoded vector returned. 
+
+The global threshold is derived by combining Weber's Law~\parencite{weber1996eh} with an exponential moving average (EMA)~\parencite{wren1997pfinder} of the frame's mean luminance. Rather than maintaining a separate background estimate, the adaptive threshold $T_{t+1}$ is updated directly in a single recurrence relation:
+
+\begin{equation} \label{eq:t_formula}
+    T_{t+1} = (1 - \lambda)T_t + \lambda \alpha I_{t+1}
+\end{equation}
+\noindent\small
+\begin{tabular}{@{}l@{\hskip 6pt}l}
+    \textbf{where:} & $T_t$ is the adaptive global threshold at frame $t$, \\
+                    & $\lambda \in (0,1)$ is the EMA smoothing factor, \\
+                    & $\alpha$ is the Weber fraction (ratio of noticeable change, set to $\alpha = 0.01$ for visual luminance), \\
+                    & $I_{t+1}$ is the mean luminance of frame $t+1$.
+\end{tabular}
+\normalsize
 
 \begin{figure}[htbp]
     \centering
