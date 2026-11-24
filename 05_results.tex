@@ -1,6 +1,42 @@
 \section{Results} \label{chapter:results}
-The main goal of experiments on described framework was to obtain symbols that represent given environment in terms functional for given robot. Appendix~\ref{app:symbols} holds all obtained symbols.
+
+The main goal of the experiments on the described framework is to learn symbols that represent a given environment in terms that are functional for a given robot. Appendix~\ref{app:symbols} holds all learned symbols for a chosen set of hyperparameters.
 
 \subsection{Experiments}
 
+Experiments explored the influence of hyperparameters on learning symbols. They affect the symbols as well as the learning process. Table \ref{tab:experiments} shows the results of varying one parameter while keeping the rest at their defaults. Defaults were chosen arbitrary based on a problem dimentionality, the learning method and a given environment. Their values are shown in table \ref{tab:hyperparam}. 
+
+Each experiment was composed of 10 epochs, 100 runs each. An epoch start in randomly selected place in the room~1 (fig. \ref{fig:sim:arena}, (1)). A run is a full main loop execution (figure \ref{fig:flow_mainloop}), therefore it is an exploration or plan execution, if such is available. Each experiment is concluded with 10 tests. Each test starts in room~1, plans and failing points are collected. 
+
+%TODO: zmienić na tablekę taką jak parametry, żeby się dzieliło na strony
+\begin{table}[htbp]
+    \centering
+    \caption{
+        Experiments conducted regarding the influence of Growing Neural Gas (GNG) and symbol abstraction hyperparameters on the resulting symbolic representations and learning process.
+        \begin{tabularx}{\textwidth}{@{}l@{\hskip 6pt}X}
+            where: & \textbf{parameter} is the parameter and its value that differs from default, \\
+                            & \textbf{no. symbols} is the total number of learn symbols, \\
+                            & \textbf{run time} is the total time of the experiment, \\
+                            & \textbf{success rate} in tests (single run without learning), \\
+                            & \textbf{learning drop} how much less the robot learns in next epoch. Since robot collects only unexpected or experimental data, the update frequency should drop with time, 
+        \end{tabularx}
+    }
+    \label{tab:experiments}
+  \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
+    {
+        \begin{tabularx}{\textwidth}{@{} X | X | X | X | X @{}}
+            \toprule
+            \textbf{parameter} & \textbf{no. symbols} & \textbf{run time} & \textbf{success rate} & \textbf{learning drop} \\
+            \hline
+            \\
+            \bottomrule
+        \end{tabularx}
+    }
+\end{table}
+
+
+
 \subsection{Symbols}
+\subsubsection*{Perception of the Robot}
+
+\subsubsection*{Symbol Visualisation}

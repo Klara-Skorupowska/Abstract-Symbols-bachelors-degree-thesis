@@ -19,7 +19,7 @@ The actuators are two differential wheels, which enables the robot to move non-h
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth, height=0.85\textheight, keepaspectratio]{pictures/robot_perspective.png}
-    \caption{Simplified model of an e-Puck 2 as cylinder body with differential wheels. Eyes added purely for aesthetics.} 
+    \caption{Simplified model of an e-Puck 2 as cylinder body with differential wheels. Eyes added purely for aesthetics. } 
     \label{fig:sim:robot}
 \end{figure}
 
@@ -31,7 +31,7 @@ The characteristics of the arena enable the robot to navigate between the rooms.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth, height=0.85\textheight, keepaspectratio]{pictures/arena_perspective.png}
-    \caption{Model of an arena used in the simulation. Two rooms separated by a wall with the door.} 
+    \caption{Model of an arena used in the simulation. Two rooms separated by a wall with the door. Elements: room~1 (1), room~2 (2), door (3), goal (4).} 
     \label{fig:sim:arena}
 \end{figure}
 
@@ -80,7 +80,7 @@ Table \ref{tab:skills} shows the skills in skillset, as well as their limitation
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth, height=0.85\textheight, keepaspectratio]{pictures/przeddrzwi.png}
-    \caption{View on the ongoing simulation. Supervisor enforced zones visible around door and goal.} 
+    \caption{View on the ongoing simulation. Supervisor enforced zones visible around door and goal. Zones are not visible for the robot.} 
     \label{fig:sim:zones}
 \end{figure}
 
@@ -102,56 +102,56 @@ Symbols and predicates are saved as GNG objects in a \textit{Brain} structure. O
 
 \subsubsection*{Hyperparameters}
 Learning process is dicated by hyperparameters of GNG and symbol abstracting process. Table \ref{tab:hyperparam} presents them and briefly describes their influence on resulting symbols. Each hyperparameter affect level of generalization of the symbols, computational time, and adaptations to dynamic environment.
-\begin{table}[htbp]
-    \centering
-    \caption{Influence of Growing Neural Gas (GNG) and symbol abstraction hyperparameters on the resulting symbolic representations.}
-    \label{tab:hyperparam}
-  \adjustbox{max width=\textwidth, max totalheight=0.85\textheight, keepaspectratio}
-    {
-      \begin{tabularx}{\textwidth}{@{} l l X @{}}
-          \toprule
-          \textbf{Parameter} & \textbf{Default} & \textbf{Influence on Resulting Symbols} \\
-          \midrule
-          \multicolumn{3}{@{}l}{\textit{Symbol Abstraction \& Partitioning Parameters}} \\
-          \midrule
-          \texttt{precision} & $0.95$ & Sets the minimum Voronoi overlap ratio required to treat two symbols as equivalent. Higher values produce more precise symbols; lower values allow more uncertainity. \\
-          \texttt{n\_test\_points} & $100$ & Number of uniform Monte Carlo samples drawn within circumscribing bounding boxes to estimate Voronoi overlap. Higher values reduce variance in equivalence and partitioning checks at the cost of computation time. \\
-          \texttt{min\_nodes} & $2$ & Minimum number of GNG prototype nodes required for a non-empty set difference ($Q_{\text{init}}$, $Q_{\text{eff}}$, or partition remainder $Q'$) to form a valid symbol. Filters out noisy or residual boundary fragments. \\
-          \midrule
-          \multicolumn{3}{@{}l}{\textit{Growing Neural Gas (GNG) Topology \& Voronoi Granularity}} \\
-          \midrule
-          \texttt{max\_nodes} & $40$ & Upper bound on prototype nodes per predicate. Larger values allow better representation at risk of overfitting. \\
-          \texttt{base\_radius} & $0.1$ & Minimum activation radius of a Voronoi cell around a prototype node. Prevents overly narrow activation regions. \\
-          \texttt{max\_radius} & $1.0$ & Maximum activation radius of a Voronoi cell. Caps generalization in sparse regions of perceptual space. \\
-          \texttt{learning\_rate\_b} ($\epsilon_b$) & $0.2$ & Adaptation step size for the best-matching (winner) node. Higher values make symbols track recent experiences quickly; lower values stabilize prototype positions. \\
-          \texttt{learning\_rate\_n} ($\epsilon_n$) & $0.01$ & Adaptation step size for topological neighbors of the winner node. Controls topological smoothing across connected Voronoi cells. \\
-          \texttt{max\_edge\_age} & $15$ & Maximum age before an edge is pruned and isolated nodes are removed. Lower values forget unvisited regions faster, adapting symbols to environmental changes. \\
-          \texttt{lambda\_step} ($\lambda$) & $5$ & Number of experience updates between new node insertions. Lower values increase spatial resolution in high-error regions. \\
-          \texttt{alpha} ($\alpha$) & $0.7$ & Error reduction factor applied to parent nodes upon inserting a new node. \\
-          \texttt{d} & $0.99$ & Exponential decay factor applied to accumulated node errors at each step. \\
-          \bottomrule
-      \end{tabularx}
-    }
-\end{table}
+\begin{xltabular}{\textwidth}{@{} l l X @{}}
+    % --- 1. Header on the FIRST page ---
+    \caption{Growing Neural Gas (GNG) and symbol abstraction hyperparameters present in framework.}
+    \label{tab:hyperparam} \\
+    \toprule
+    \textbf{Parameter} & \textbf{Default} & \textbf{Description} \\
+    \midrule
+    \endfirsthead
+
+    % --- 2. Repeated header on SUBSEQUENT pages ---
+    \multicolumn{3}{@{}l}{\small\textit{Table \thetable\ continued from previous page}} \\
+    \toprule
+    \textbf{Parameter} & \textbf{Default} & \textbf{Description} \\
+    \midrule
+    \endhead
+
+    % --- 3. Footer at the bottom of intermediate pages ---
+    \midrule
+    \multicolumn{3}{r@{}}{\small\textit{Continued on next page}} \\
+    \endfoot
+
+    % --- 4. Final footer at the very end of the table ---
+    \bottomrule
+    \endlastfoot
+
+    % --- TABLE BODY ---
+    \multicolumn{3}{@{}l}{\textit{Symbol Abstraction \& Partitioning Parameters}} \\*
+    \morecmidrules
+    \texttt{precision} & $0.80$ & Sets the minimum Voronoi overlap ratio required to treat two symbols as equivalent. Higher values produce more precise symbols; lower values allow more uncertainty. \\
+    \texttt{n\_test\_points} & $500$ & Number of uniform Monte Carlo samples drawn within circumscribing bounding boxes to estimate Voronoi overlap. Higher values reduce variance in equivalence and partitioning checks at the cost of computation time. \\
+    \texttt{min\_nodes} & $2$ & Minimum number of GNG prototype nodes required for a non-empty set difference ($Q_{\text{init}}$, $Q_{\text{eff}}$, or partition remainder $Q'$) to form a valid symbol. Filters out noisy or residual boundary fragments. \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textit{Growing Neural Gas (GNG) Topology \& Voronoi Granularity}} \\*
+    \morecmidrules
+    \texttt{max\_nodes} & $15$ & Upper bound on prototype nodes per predicate. Larger values allow better representation at risk of overfitting. \\
+    \texttt{base\_radius} & $0.25$ & Minimum activation radius of a Voronoi cell around a prototype node. Prevents overly narrow activation regions. \\
+    \texttt{max\_radius} & $4.0$ & Maximum activation radius of a Voronoi cell. Caps generalization in sparse regions of perceptual space. \\
+    \texttt{learning\_rate\_b} ($\epsilon_b$) & $0.25$ & Adaptation step size for the best-matching (winner) node. Higher values make symbols track recent experiences quickly; lower values stabilize prototype positions. \\
+    \texttt{learning\_rate\_n} ($\epsilon_n$) & $0.01$ & Adaptation step size for topological neighbors of the winner node. Controls topological smoothing across connected Voronoi cells. \\
+    \texttt{max\_edge\_age} & $25$ & Maximum age before an edge is pruned and isolated nodes are removed. Lower values forget unvisited regions faster, adapting symbols to environmental changes. \\
+    \texttt{lambda\_step} ($\lambda$) & $10$ & Number of experience updates between new node insertions. Lower values increase spatial resolution in high-error regions. \\
+    \texttt{alpha} ($\alpha$) & $0.5$ & Error reduction factor applied to parent nodes upon inserting a new node. \\
+    \texttt{d} & $0.995$ & Exponential decay factor applied to accumulated node errors at each step. \\
+    \texttt{radii\_factor} & $0.85$ & For calculating activation radius of a Voronoi cell around a prototype node. Calculated radius is a \textit{radii\_factor} of a distance to the nearest neighbour. \\
+\end{xltabular}
 
 \subsubsection*{Visual Preprocessing}
-The separation between agent and the simulation is reinforced by virtual actuators and sensors. Each virtual element communicate through the bus with its real counterpart. This way it is possible to move the logic from simulation to real robot without the need to decouple the two.
+The separation between agent and the simulation is reinforced by using virtual actuators and sensors. Each virtual element communicate through the bus with its real counterpart. This way it is possible to move the logic from simulation to real robot without the need to decouple the two.
 
-The preprocessing described in chapter \ref{chapter:theory:visuals} is done within virtual sensors. The flow of this process is shown on figure \ref{fig:flow_preprocess}. A virtual camera sensor recives an RGB pixel matrix (160x120) from real camera sensor. Then, the matrix is partitioned into 20x20 cell grid with 10x10 center. For each cell normalized mean RGB and center-surround contrast is extracted. The activation for on/off-center cells is based on global threshold from previous frame. Finally, the global threshold  is updated, and encoded vector returned. 
-
-The global threshold is derived by combining Weber's Law~\parencite{weber1996eh} with an exponential moving average (EMA)~\parencite{wren1997pfinder} of the frame's mean luminance. Rather than maintaining a separate background estimate, the adaptive threshold $T_{t+1}$ is updated directly in a single recurrence relation:
-
-\begin{equation} \label{eq:t_formula}
-    T_{t+1} = (1 - \lambda)T_t + \lambda \alpha I_{t+1}
-\end{equation}
-\noindent\small
-\begin{tabular}{@{}l@{\hskip 6pt}l}
-    \textbf{where:} & $T_t$ is the adaptive global threshold at frame $t$, \\
-                    & $\lambda \in (0,1)$ is the EMA smoothing factor, \\
-                    & $\alpha$ is the Weber fraction (ratio of noticeable change, set to $\alpha = 0.01$ for visual luminance), \\
-                    & $I_{t+1}$ is the mean luminance of frame $t+1$.
-\end{tabular}
-\normalsize
+The preprocessing described in chapter \ref{chapter:idea:visuals} is done within virtual sensors. The flow of this process is shown on figure \ref{fig:flow_preprocess}. A virtual camera sensor recives an RGB pixel matrix (160x120) from real camera sensor. Then, the matrix is partitioned into 20x20 cell grid with 10x10 center. For each cell normalized mean RGB and center-surround contrast is extracted. The activation for on/off-center cells is based on global threshold from previous frame. Finally, the global threshold  is updated, and encoded vector returned. 
 
 \begin{figure}[htbp]
     \centering
