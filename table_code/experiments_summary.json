@@ -1,0 +1,154 @@
+[
+    {
+        "experiment": "exp_000",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, radii_factor=1.0",
+        "no. symbols": 6,
+        "run time": "00:18:42",
+        "success rate": 0,
+        "learning drop": 0.006061
+    },
+    {
+        "experiment": "exp_001",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=5",
+        "no. symbols": 6,
+        "run time": "00:22:21",
+        "success rate": 0,
+        "learning drop": 0.187879
+    },
+    {
+        "experiment": "exp_002",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=5",
+        "no. symbols": 9,
+        "run time": "00:25:50",
+        "success rate": 0,
+        "learning drop": -0.060606
+    },
+    {
+        "experiment": "exp_003",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=10",
+        "no. symbols": 10,
+        "run time": "00:24:21",
+        "success rate": 0,
+        "learning drop": -0.018182
+    },
+    {
+        "experiment": "exp_004",
+        "parameter": "precision=0.5, min_nodes_in_symbol=2, max_nodes_in_symbol=30",
+        "no. symbols": 8,
+        "run time": "00:23:54",
+        "success rate": 0,
+        "learning drop": 0.090909
+    },
+    {
+        "experiment": "exp_005",
+        "parameter": "precision=1.0, min_nodes_in_symbol=2, max_nodes_in_symbol=?",
+        "no. symbols": 14,
+        "run time": "00:24:49",
+        "success rate": 0,
+        "learning drop": 0.060606
+    },
+    {
+        "experiment": "exp_006",
+        "parameter": "n_test_points=100, min_nodes_in_symbol=2, max_nodes_in_symbol=?",
+        "no. symbols": 11,
+        "run time": "00:22:50",
+        "success rate": 0,
+        "learning drop": -0.090909
+    },
+    {
+        "experiment": "exp_007",
+        "parameter": "n_test_points=1000, min_nodes_in_symbol=2, max_nodes_in_symbol=?",
+        "no. symbols": 8,
+        "run time": "00:19:11",
+        "success rate": 0,
+        "learning drop": -0.024242
+    },
+    {
+        "experiment": "exp_008",
+        "parameter": "min_nodes_in_symbol=0, max_nodes_in_symbol=?",
+        "no. symbols": 88,
+        "run time": "00:18:45",
+        "success rate": 0,
+        "learning drop": -0.078788
+    },
+    {
+        "experiment": "exp_009",
+        "parameter": "min_nodes_in_symbol=None, max_nodes_in_symbol=?",
+        "no. symbols": 33,
+        "run time": "00:20:37",
+        "success rate": 0,
+        "learning drop": -0.042424
+    },
+    {
+        "experiment": "exp_010",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, base_radius=0.1",
+        "no. symbols": 11,
+        "run time": "00:18:54",
+        "success rate": 0,
+        "learning drop": 0.10303
+    },
+    {
+        "experiment": "exp_011",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, base_radius=0.5",
+        "no. symbols": 11,
+        "run time": "00:18:06",
+        "success rate": 0,
+        "learning drop": 0.072727
+    },
+    {
+        "experiment": "exp_012",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, max_radius=1.0",
+        "no. symbols": 12,
+        "run time": "00:17:05",
+        "success rate": 0,
+        "learning drop": 0.145455
+    },
+    {
+        "experiment": "exp_013",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, max_radius=16.0",
+        "no. symbols": 14,
+        "run time": "00:17:12",
+        "success rate": 0,
+        "learning drop": 0.024242
+    },
+    {
+        "experiment": "exp_014",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, max_edge_age=1",
+        "no. symbols": 5,
+        "run time": "00:18:56",
+        "success rate": 0,
+        "learning drop": -0.151515
+    },
+    {
+        "experiment": "exp_015",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, max_edge_age=50",
+        "no. symbols": 14,
+        "run time": "00:21:06",
+        "success rate": 0,
+        "learning drop": -0.181818
+    },
+    {
+        "experiment": "exp_016",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, lambda_step=1",
+        "no. symbols": 10,
+        "run time": "00:19:24",
+        "success rate": 0,
+        "learning drop": 0.133333
+    },
+    {
+        "experiment": "exp_017",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, lambda_step=20",
+        "no. symbols": 7,
+        "run time": "00:21:39",
+        "success rate": 0,
+        "learning drop": -0.078788
+    },
+    {
+        "experiment": "exp_018",
+        "parameter": "min_nodes_in_symbol=2, max_nodes_in_symbol=?, radii_factor=0.5",
+        "no. symbols": 16,
+        "run time": "00:19:38",
+        "success rate": 0,
+        "learning drop": 0.066667
+    }
+]
